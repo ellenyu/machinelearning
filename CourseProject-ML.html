@@ -70,7 +70,7 @@ img {
 
 <div id="overview" class="section level1">
 <h1>Overview</h1>
-<p>We are presented with dataset of acceleration measurements taken from individuals performing dumbbell exercises. This report is an analysis of using the Random Forest algorithm to construct a model that predicts if the exercise was performed properly. Use of the random forest algorithm constructed a model that had an error rate of 0.1%</p>
+<p>We are presented with dataset of acceleration measurements taken from individuals performing dumbbell exercises. This report is an analysis of using the Random Forest algorithm to construct a model that predicts if the exercise was performed properly. Use of the random forest algorithm constructed a model that had an error rate of 0.13%</p>
 </div>
 <div id="the-dataset" class="section level1">
 <h1>The Dataset</h1>
@@ -82,8 +82,8 @@ img {
 <p>The random forest algorithm was used to develop model to predict the classe parameter. Only a subset of dataset was used. This was determined by looking at the validation set (pml-testing.csv) and seeing what columns were populated. The dataset was also divided where 70% of the set was used for model selection and 30% for testing to prevent overfitting.</p>
 <pre class="r"><code>pml_train&lt;-read.csv(&quot;pml-training.csv&quot;)
 subt&lt;-c(&quot;user_name&quot;,&quot;raw_timestamp_part_1&quot;,
-       &quot;raw_timestamp_part_2&quot;,&quot;cvtd_timestamp&quot;,
-       &quot;new_window&quot;,&quot;num_window&quot;,&quot;roll_belt&quot;,
+       &quot;raw_timestamp_part_2&quot;,
+       &quot;num_window&quot;,&quot;roll_belt&quot;,
        &quot;pitch_belt&quot;,&quot;yaw_belt&quot;,&quot;total_accel_belt&quot;,
        &quot;gyros_belt_x&quot;,&quot;gyros_belt_y&quot;,&quot;gyros_belt_z&quot;,
        &quot;accel_belt_x&quot;,&quot;accel_belt_y&quot;,&quot;accel_belt_z&quot;,
@@ -117,18 +117,51 @@ modFit3&lt;-randomForest(classe ~ .,data=pml_useTrain, importance = TRUE)</code>
                      Number of trees: 500
 No. of variables tried at each split: 7
 
-        OOB estimate of  error rate: 0.1%
+        OOB estimate of  error rate: 0.13%
 Confusion matrix:
      A    B    C    D    E  class.error
-A 4184    1    0    0    0 0.0002389486
+A 4185    0    0    0    0 0.0000000000
 B    2 2846    0    0    0 0.0007022472
-C    0    3 2564    0    0 0.0011686794
-D    0    0    2 2408    2 0.0016583748
-E    0    0    0    4 2702 0.0014781966</code></pre>
+C    0    6 2560    1    0 0.0027269186
+D    0    0    5 2405    2 0.0029021559
+E    0    0    0    3 2703 0.0011086475</code></pre>
 <p>We use our model on the remaining 30% of the dataset used as a test set and see the error rate compares similar to the estimate by the random forest algorithm.</p>
 <pre class="r"><code>pred&lt;-predict(modFit3,pml_useTest)
 1-mean(pred==pml_useTest$classe)
-[1] 0.0008156607</code></pre>
+[1] 0.0006117455
+
+&gt; confusionMatrix(pred,pml_useTest$classe)
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    A    B    C    D    E
+         A 1395    0    0    0    0
+         B    0  949    1    0    0
+         C    0    0  854    1    0
+         D    0    0    0  803    1
+         E    0    0    0    0  900
+
+Overall Statistics
+                                          
+               Accuracy : 0.9994          
+                 95% CI : (0.9982, 0.9999)
+    No Information Rate : 0.2845          
+    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+                                          
+                  Kappa : 0.9992          
+ Mcnemar's Test P-Value : NA              
+
+Statistics by Class:
+
+                     Class: A Class: B Class: C Class: D Class: E
+Sensitivity            1.0000   1.0000   0.9988   0.9988   0.9989
+Specificity            1.0000   0.9997   0.9998   0.9998   1.0000
+Pos Pred Value         1.0000   0.9989   0.9988   0.9988   1.0000
+Neg Pred Value         1.0000   1.0000   0.9998   0.9998   0.9998
+Prevalence             0.2845   0.1935   0.1743   0.1639   0.1837
+Detection Rate         0.2845   0.1935   0.1741   0.1637   0.1835
+Detection Prevalence   0.2845   0.1937   0.1743   0.1639   0.1835
+Balanced Accuracy      1.0000   0.9999   0.9993   0.9993   0.9994</code></pre>
 </div>
 
 
